@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+from datetime import datetime as dt
 import pandas as pd
 import time
 
@@ -49,13 +50,34 @@ def click_and_safe(section_link, links):
             flag = True
             k = 1
             while flag:
+                print(dt.now().strftime('%H:%M:%S'))
+                time.sleep(1)
                 try:
                     print(f'Clicking anoter offer: {k}')
                     with page.expect_popup() as page1_info:
                         page.locator(f"div:nth-child({k}) > .asset-card__content-wrapper > .asset-card__photos > a").click()
                     page1 = page1_info.value
-                    links.append(page1.url)
-                    page1.close()
+                    current_link = page1.url
+
+
+
+                    if 'chrome-error' not in current_link:
+                        links.append(current_link)
+                        page1.close()
+                    else:
+                        print(f'chrome error here, taking screenshot')
+                        page1.screenshot(path=rf"screens\screenshot_error_{k}.png")
+                        page.screenshot(path=rf'screens\screenshot_error_main_tab_{k}.png')
+                        print(f'lets wait and try again')
+                        page1.close()
+                        time.sleep(10)
+                        print(f'Clicking anoter offer: {k}')
+                        with page.expect_popup() as page1_info:
+                            page.locator(
+                                f"div:nth-child({k}) > .asset-card__content-wrapper > .asset-card__photos > a").click()
+                        page1 = page1_info.value
+                        current_link = page1.url
+                        links.append(current_link)
                     k += 1
                 except Exception as e:
                     print('All links are clicked')
@@ -68,11 +90,8 @@ def click_and_safe(section_link, links):
 print(f'start')
 result_df = pd.DataFrame()
 result_df['links'] = click_and_safe(section_link, links)
-result_df.to_excel('portal_da_links.xlsx', index=False)
+result_df.to_excel('portal_da_links_lands_10_01_23_2.xlsx', index=False)
 
-
-
-
-
+# TODO - done, now need in parser per link
 
 
