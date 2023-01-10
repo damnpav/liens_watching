@@ -3,8 +3,8 @@ import pandas as pd
 import time
 
 links = []
-section_link = 'https://portal-da.ru/objects/catalog/buy/warehouse_complex'
-#section_link = 'https://portal-da.ru/objects/catalog/buy/section'
+#section_link = 'https://portal-da.ru/objects/catalog/buy/warehouse_complex'
+section_link = 'https://portal-da.ru/objects/catalog/buy/section'
 
 
 def click_and_safe(section_link, links):
@@ -73,13 +73,6 @@ result_df.to_excel('portal_da_links.xlsx', index=False)
 
 
 
-
-
-
-## got it!! вот так надо доставать url
-# теперь надо научиться выводить все объявления и ходить по ним
-# или попробовать сразу на старте 'evaluateAll' получить все локаторы
-# надо нажимать кнопку 'Показать еще' пока она не пропадет, а потом тянуть child
 
 
 
