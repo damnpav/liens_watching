@@ -16,18 +16,19 @@ links_df = pd.read_excel(path_to_links)
 unique_keys_df = pd.read_excel('unique_cdata_keys.xlsx')
 needed_keys_df = pd.read_excel('needed_cdata_keys.xlsx')
 
-new_keys_to_append = []  # to save new keys from htmls
+new_keys_to_append = pd.DataFrame(columns=['new_keys', 'links'])  # to save new keys from htmls
 result_df = pd.DataFrame(columns=['links'] + needed_keys_df['keys'].to_list())  # dataframe to save data
 
 try:
-    for link in tqdm(links_df[:10]['links']):
+    for link in tqdm(links_df['links']):
         try:
             r = requests.get(link, headers={'user-agent': agent_str})
             html_text = r.text
             result_dict, new_unique_keys = parse_html(html_text, unique_keys_df, needed_keys_df)
 
             if len(new_unique_keys) > 0:
-                new_keys_to_append.append(new_unique_keys)
+                new_keys_to_append = pd.concat([pd.DataFrame([{'new_keys': new_unique_keys, 'links': link}]),
+                                                new_keys_to_append], ignore_index=True)
 
             df_to_append = pd.DataFrame([result_dict])
             df_to_append['links'] = link
@@ -39,13 +40,11 @@ try:
 except Exception as e:
     print(f'General Exception {e}')
 
-result_df.to_excel('links_results_12_01_23.xlsx', index=False)
+result_df.to_excel(r'data/links_results_13_01_23.xlsx', index=False)
 
-if len(set(new_keys_to_append)) > 0:
-    print(f'There are {len(set(new_keys_to_append))} new keys!')
-    new_keys_df = pd.DataFrame()
-    new_keys_df['new_keys'] = list(set(new_keys_to_append))
-    new_keys_df.to_excel('new_keys_12_01_23.xlsx')
+if len(new_keys_to_append) > 0:
+    print(f'New keys in {len(new_keys_to_append)} links')
+    new_keys_to_append.to_excel(r'data/new_keys_13_01_23.xlsx', index=False)
 
 
 
