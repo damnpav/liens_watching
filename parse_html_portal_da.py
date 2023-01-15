@@ -46,10 +46,28 @@ def parse_details(html_text):
     :param html_text: goal html text
     :return:
     """
-    views = re.findall('\d+.просмотр', html_text)[0]
-    region_str = re.findall('mr-4.*</span><span', html_text)[0].replace('mr-4">', '').replace('</span><span', '')
-    publication_date = re.findall('time-s.*v-align c-text', exmpl_html)[0].replace('time-s"></ui-icon>', '').replace(
-        '</div><div class="v-align c-text', '')
+    error_list = []
+    views, region_str, publication_date = '', '', ''
+
+    try:
+        views = re.findall('\d+.просмотр', html_text)[0]
+    except:
+        error_list.append('views')
+
+    try:
+        region_str = re.findall('mr-4.*</span><span', html_text)[0].replace('mr-4">', '').replace('</span><span', '')
+    except:
+        error_list.append('region_str')
+
+    try:
+        publication_date = re.findall('time-s.*\d\d\s\S{3,8}\s\d\d\d\d', html_text)[0].replace('time-s"></ui-icon>',
+                                                                                                '')
+    except:
+        error_list.append('publication_date')
+
+    if len(error_list) > 0:
+        print(f'Errors in {error_list}')
+
     return views, region_str, publication_date
 
 
