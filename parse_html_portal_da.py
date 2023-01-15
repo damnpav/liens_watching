@@ -30,6 +30,15 @@ def parse_html(html_text, unique_keys_df, needed_keys_df):
     return result_dict, new_unique_keys
 
 
+def save_html(html_str, path_to_save):
+    agent_str = f'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/' \
+                f'91.0.4472.114 Safari/537.36'
+    r = requests.get(html_str, headers={'user-agent': agent_str})
+    html_text = r.text
+    with open(path_to_save, 'w') as html_file:
+        html_file.write(html_text)
+
+
 
 
 
