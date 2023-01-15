@@ -13,7 +13,7 @@ def parse_html(html_text, unique_keys_df, needed_keys_df):
     :param html_text: html str
     :param unique_keys_df: dataframe with seen unique keys
     :param needed_keys_df: dataframe with keys to filter out
-    :return:
+    :return: result_dict (dict); new_unique_keys (list) - list with new unseen keys
     """
     cdata_str = html_text[html_text.find('CDATA') + 7:html_text.find('//]]>') - 1]
     cdata_list = cdata_str.split(';')
@@ -37,6 +37,20 @@ def save_html(html_str, path_to_save):
     html_text = r.text
     with open(path_to_save, 'w') as html_file:
         html_file.write(html_text)
+    return html_text
+
+
+def parse_details(html_text):
+    """
+    Function to parse out details of lien from html code
+    :param html_text: goal html text
+    :return:
+    """
+    views = re.findall('\d+.просмотр', html_text)[0]
+    region_str = re.findall('mr-4.*</span><span', html_text)[0].replace('mr-4">', '').replace('</span><span', '')
+    publication_date = re.findall('time-s.*v-align c-text', exmpl_html)[0].replace('time-s"></ui-icon>', '').replace(
+        '</div><div class="v-align c-text', '')
+    return views, region_str, publication_date
 
 
 

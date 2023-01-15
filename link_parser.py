@@ -47,7 +47,6 @@ if len(new_keys_to_append) > 0:
     new_keys_to_append.to_excel(r'data/new_keys_13_01_23.xlsx', index=False)
 
 
-# надо добавить еще дату публикацию и прочие наблюдения
 
 
 
