@@ -17,13 +17,20 @@ def encode_features(selected_df, features_list):
     :return:
     """
     le = LabelEncoder()
-    label_encoded_df = selected_df[features_list].copy()
+    #label_encoded_df = selected_df[features_list].copy()
+    label_encoded_df = selected_df.copy()
     for col in label_encoded_df.select_dtypes(include='O').columns:
-        label_encoded_df[col]=le.fit_transform(label_encoded_df[col])
+        label_encoded_df[col] = le.fit_transform(label_encoded_df[col])
     return label_encoded_df
 
 
 def make_regression(data_df, target_col):
+    """
+    Function to fit regression model to data
+    :param data_df: dataframe with learning data
+    :param target_col: column with target
+    :return: model (object of regr model), X_test_std, Y_test_std (scaled test data), stdsc (object of Scaler)
+    """
 
     # splitting data in train and test datasets, also in target and features (X,Y)
     train_df, test_df = train_test_split(data_df, test_size=0.2, shuffle=True)
@@ -46,9 +53,12 @@ def make_regression(data_df, target_col):
     # fit model
     model = regression_model.fit(X_train_std, Y_train_std)
 
-    # todo c этим надо еще поработать - навестить функцию тестирования, показа результатов и тд
+    # todo c этим надо еще поработать - навесить функцию тестирования, показа результатов и тд
 
-    return model
+    return model, X_test_std, Y_test_std, stdsc
+
+
+
 
 
 
