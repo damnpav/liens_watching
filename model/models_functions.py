@@ -9,15 +9,13 @@ from sklearn.preprocessing import StandardScaler
 data_path = '../lien_df1_18_01_23.csv'
 
 
-def encode_features(selected_df, features_list):
+def encode_features(selected_df):
     """
     Function to encode categorical data
-    :param features_list: list with categorical features to encode
     :param selected_df: input data
     :return:
     """
     le = LabelEncoder()
-    #label_encoded_df = selected_df[features_list].copy()
     label_encoded_df = selected_df.copy()
     for col in label_encoded_df.select_dtypes(include='O').columns:
         label_encoded_df[col] = le.fit_transform(label_encoded_df[col])
@@ -42,6 +40,8 @@ def make_regression(data_df, target_col):
     # objects of model and scaler
     regression_model = LinearRegression()
     stdsc = StandardScaler()
+    # todo
+    # ты fit transofrm для разных данных используешь, так нельзя!
 
     # scale data
     X_train_std = stdsc.fit_transform(train_X)
