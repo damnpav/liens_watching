@@ -11,7 +11,7 @@ tqdm.pandas()
 geolocator = Nominatim(user_agent="my app")
 #pd.options.display.float_format = '{:.2f}'.format
 
-IN_DATA_PATH = r'data/lien_data_Jan.csv'
+IN_DATA_PATH = r'../data/lien_data_Jan.csv'
 OUT_DATA_FOLDER = r'data/'
 
 

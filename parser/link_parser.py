@@ -5,9 +5,9 @@ from tqdm import tqdm
 import time
 
 
-path_to_links = 'portal_da_links_lands_10_01_23_2.xlsx'
-path_to_unique_keys = 'unique_cdata_keys.xlsx'
-path_to_needed_keys = 'needed_cdata_keys.xlsx'
+path_to_links = '../data/portal_da_links_lands_10_01_23_2.xlsx'
+path_to_unique_keys = '../data/unique_cdata_keys.xlsx'
+path_to_needed_keys = '../data/needed_cdata_keys.xlsx'
 
 agent_str = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
 

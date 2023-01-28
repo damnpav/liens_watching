@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-data_path = '../lien_df1_18_01_23.csv'
+data_path = '../data/lien_df1_18_01_23.csv'
 
 
 def encode_features(selected_df):
