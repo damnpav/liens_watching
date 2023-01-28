@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
+from datetime import datetime as dt
 from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, Normalizer, PowerTransformer
-
+from sklearn.externals import joblib
 
 
 data_path = '../data/lien_df1_18_01_23.csv'
@@ -94,8 +95,8 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
                 Y_test_scaled, metric_name):
     """
     Function to metric predictions of model
-    There are 15 metrics: mape, mae, explained_variance_score, max_error, mse, rmse, msle, rmsle, mae, r2, tweedie,
-    gamma, d2_ae, d2_pinball, d2_tweedie
+    There are 15 metrics: metric, mae, explained_variance_score, max_error, mse, rmse, msle, rmsle, mae, r2, tweedie,
+    gamma, d2_ae, d2_pinball, metric
     :param model: object of model
     :param scaler_y_train: scalers
     :param scaler_y_test: 
@@ -107,28 +108,28 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
     :return: 
     """
 
-    if metric_name == 'mape':
+    if metric_name == 'metric':
         # scaled data
         # train data
         y_train_scaled_pred = model.predict(X_train_scaled)
-        mape_train_scaled = metrics.mean_absolute_percentage_error(Y_train_scaled, y_train_scaled_pred)
+        metric_train_scaled = metrics.mean_absolute_percentage_error(Y_train_scaled, y_train_scaled_pred)
         
         # test data
         # train data
         y_test_scaled_pred = model.predict(X_test_scaled)
-        mape_test_scaled = metrics.mean_absolute_percentage_error(Y_test_scaled, y_test_scaled_pred)
+        metric_test_scaled = metrics.mean_absolute_percentage_error(Y_test_scaled, y_test_scaled_pred)
         
         # unscaled data
         # train data
         y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
         Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
-        mape_train_unscaled = metrics.mean_absolute_percentage_error(Y_train_unscaled, y_train_unscaled_pred)
+        metric_train_unscaled = metrics.mean_absolute_percentage_error(Y_train_unscaled, y_train_unscaled_pred)
         
         # test data
         y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
         Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
-        mape_test_unscaled = metrics.mean_absolute_percentage_error(Y_test_unscaled, y_test_unscaled_pred)
-        return mape_train_scaled, mape_test_scaled, mape_train_unscaled, mape_test_unscaled
+        metric_test_unscaled = metrics.mean_absolute_percentage_error(Y_test_unscaled, y_test_unscaled_pred)
+        return metric_train_scaled, metric_test_scaled, metric_train_unscaled, metric_test_unscaled
     elif metric_name == 'mae':
         # scaled data
         # train data
@@ -415,32 +416,71 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
         Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
         d2_pinball_test_unscaled = metrics.d2_pinball_score(Y_test_unscaled, y_test_unscaled_pred)
         return d2_pinball_train_scaled, d2_pinball_test_scaled, d2_pinball_train_unscaled, d2_pinball_test_unscaled
-    elif metric_name == 'd2_tweedie':
+    elif metric_name == 'metric':
         # scaled data
         # train data
         y_train_scaled_pred = model.predict(X_train_scaled)
-        d2_tweedie_train_scaled = metrics.d2_tweedie_score(Y_train_scaled, y_train_scaled_pred)
+        metric_train_scaled = metrics.metric_score(Y_train_scaled, y_train_scaled_pred)
 
         # test data
         # train data
         y_test_scaled_pred = model.predict(X_test_scaled)
-        d2_tweedie_test_scaled = metrics.d2_tweedie_score(Y_test_scaled, y_test_scaled_pred)
+        metric_test_scaled = metrics.metric_score(Y_test_scaled, y_test_scaled_pred)
 
         # unscaled data
         # train data
         y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
         Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
-        d2_tweedie_train_unscaled = metrics.d2_tweedie_score(Y_train_unscaled, y_train_unscaled_pred)
+        metric_train_unscaled = metrics.metric_score(Y_train_unscaled, y_train_unscaled_pred)
 
         # test data
         y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
         Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
-        d2_tweedie_test_unscaled = metrics.d2_tweedie_score(Y_test_unscaled, y_test_unscaled_pred)
-        return d2_tweedie_train_scaled, d2_tweedie_test_scaled, d2_tweedie_train_unscaled, d2_tweedie_test_unscaled
+        metric_test_unscaled = metrics.metric_score(Y_test_unscaled, y_test_unscaled_pred)
+        return metric_train_scaled, metric_test_scaled, metric_train_unscaled, metric_test_unscaled
     else:
-        print("""There's no such name of metric name\nPossible metrics: mape, mae, explained_variance_score, 
-                 max_error, mse, rmse, msle, rmsle, mae, r2, tweedie, gamma, d2_ae, d2_pinball, d2_tweedie""")
+        print("""There's no such name of metric name\nPossible metrics: metric, mae, explained_variance_score, 
+                 max_error, mse, rmse, msle, rmsle, mae, r2, tweedie, gamma, d2_ae, d2_pinball, metric""")
         return False
+
+
+def model_conveyor(data_df, model_name, scaler_name, metric_names, save_model=False):
+    """
+    Function to pass data through conveyor of data scaling, encoding and then fitting model and measure test metrics
+    :param save_model: If True then function will save models in pkl file
+    :param metric_names: list with metrics
+    :param scaler_name: name of scaler
+    :param data_df: DataFrame with data to model
+    :return:
+    """
+    encoded_df = encode_features(data_df)
+
+    if model_name == 'linear_regression':
+        model, X_train_scaled, Y_train_scaled, X_test_scaled, Y_test_scaled, scaler_x_train, scaler_y_train, \
+        scaler_x_test, scaler_y_test = make_regression(encoded_df, 'price_value', scaler_name)
+
+        metrics_results = {}
+        for metric_name in metric_names:
+            metrics_results[metric_name] = {}  # where to store results
+
+            metric_train_scaled, metric_test_scaled, metric_train_unscaled, metric_test_unscaled = \
+            get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_scaled, X_test_scaled,
+                        Y_test_scaled, metric_name)
+
+            metrics_results[metric_name][f'{metric_name}_train_scaled'] = metric_train_scaled
+            metrics_results[metric_name][f'{metric_name}_test_scaled'] = metric_test_scaled
+            metrics_results[metric_name][f'{metric_name}_train_unscaled'] = metric_train_unscaled
+            metrics_results[metric_name][f'{metric_name}_test_unscaled'] = metric_test_unscaled
+
+        # save model
+        if save_model:
+            joblib.dump(model, f'{model_name}_{dt.now().strftime("%H_%M_%d_%m_%Y")}.pkl')
+
+    return model, metrics_results, X_train_scaled, Y_train_scaled, X_test_scaled, Y_test_scaled, scaler_x_train, \
+           scaler_y_train, scaler_x_test, scaler_y_test
+
+
+
 
 
 
