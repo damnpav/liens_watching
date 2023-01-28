@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 from datetime import datetime as dt
 from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, Normalizer, PowerTransformer
-from sklearn.externals import joblib
+import joblib
 
 
 data_path = '../data/lien_df1_18_01_23.csv'
@@ -95,7 +96,7 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
                 Y_test_scaled, metric_name):
     """
     Function to metric predictions of model
-    There are 15 metrics: metric, mae, explained_variance_score, max_error, mse, rmse, msle, rmsle, mae, r2, tweedie,
+    There are 14 metrics: mape, mae, explained_variance_score, max_error, mse, rmse, msle, rmsle, r2, tweedie,
     gamma, d2_ae, d2_pinball, metric
     :param model: object of model
     :param scaler_y_train: scalers
@@ -108,7 +109,7 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
     :return: 
     """
 
-    if metric_name == 'metric':
+    if metric_name == 'mape':
         # scaled data
         # train data
         y_train_scaled_pred = model.predict(X_train_scaled)
@@ -284,28 +285,6 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
         Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
         rmsle_test_unscaled = metrics.mean_squared_log_error(Y_test_unscaled, y_test_unscaled_pred, squared=False)
         return rmsle_train_scaled, rmsle_test_scaled, rmsle_train_unscaled, rmsle_test_unscaled
-    elif metric_name == 'mae':
-        # scaled data
-        # train data
-        y_train_scaled_pred = model.predict(X_train_scaled)
-        mae_train_scaled = metrics.median_absolute_error(Y_train_scaled, y_train_scaled_pred)
-
-        # test data
-        # train data
-        y_test_scaled_pred = model.predict(X_test_scaled)
-        mae_test_scaled = metrics.median_absolute_error(Y_test_scaled, y_test_scaled_pred)
-
-        # unscaled data
-        # train data
-        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
-        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
-        mae_train_unscaled = metrics.median_absolute_error(Y_train_unscaled, y_train_unscaled_pred)
-
-        # test data
-        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
-        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
-        mae_test_unscaled = metrics.median_absolute_error(Y_test_unscaled, y_test_unscaled_pred)
-        return mae_train_scaled, mae_test_scaled, mae_train_unscaled, mae_test_unscaled
     elif metric_name == 'r2':
         # scaled data
         # train data
@@ -439,9 +418,9 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
         metric_test_unscaled = metrics.metric_score(Y_test_unscaled, y_test_unscaled_pred)
         return metric_train_scaled, metric_test_scaled, metric_train_unscaled, metric_test_unscaled
     else:
-        print("""There's no such name of metric name\nPossible metrics: metric, mae, explained_variance_score, 
-                 max_error, mse, rmse, msle, rmsle, mae, r2, tweedie, gamma, d2_ae, d2_pinball, metric""")
-        return False
+        print("""There's no such name of metric name\nPossible metrics: metric, mape, explained_variance_score, 
+                 max_error, mse, rmse, msle, rmsle, r2, tweedie, gamma, d2_ae, d2_pinball, metric""")
+        return None
 
 
 def model_conveyor(data_df, model_name, scaler_name, metric_names, save_model=False):
@@ -460,21 +439,25 @@ def model_conveyor(data_df, model_name, scaler_name, metric_names, save_model=Fa
         scaler_x_test, scaler_y_test = make_regression(encoded_df, 'price_value', scaler_name)
 
         metrics_results = {}
-        for metric_name in metric_names:
+        for metric_name in tqdm(metric_names):
+            print(metric_name)
             metrics_results[metric_name] = {}  # where to store results
 
             metric_train_scaled, metric_test_scaled, metric_train_unscaled, metric_test_unscaled = \
             get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_scaled, X_test_scaled,
                         Y_test_scaled, metric_name)
 
-            metrics_results[metric_name][f'{metric_name}_train_scaled'] = metric_train_scaled
-            metrics_results[metric_name][f'{metric_name}_test_scaled'] = metric_test_scaled
-            metrics_results[metric_name][f'{metric_name}_train_unscaled'] = metric_train_unscaled
-            metrics_results[metric_name][f'{metric_name}_test_unscaled'] = metric_test_unscaled
+            metrics_results[metric_name][f'train_scaled'] = metric_train_scaled
+            metrics_results[metric_name][f'test_scaled'] = metric_test_scaled
+            metrics_results[metric_name][f'train_unscaled'] = metric_train_unscaled
+            metrics_results[metric_name][f'test_unscaled'] = metric_test_unscaled
 
         # save model
         if save_model:
             joblib.dump(model, f'{model_name}_{dt.now().strftime("%H_%M_%d_%m_%Y")}.pkl')
+    else:
+        print('model name not found')
+        return None
 
     return model, metrics_results, X_train_scaled, Y_train_scaled, X_test_scaled, Y_test_scaled, scaler_x_train, \
            scaler_y_train, scaler_x_test, scaler_y_test
