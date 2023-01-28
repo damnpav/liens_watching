@@ -90,14 +90,14 @@ def get_scalers(your_scaler):
     return scaler_x_train, scaler_y_train, scaler_x_test, scaler_y_test
 
 
-def get_metrics(model, scaler_x_train, scaler_y_train, scaler_x_test, scaler_y_test,
-                X_train_scaled, Y_train_scaled, X_test_scaled, Y_test_scaled, metric_name):
+def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_scaled, X_test_scaled,
+                Y_test_scaled, metric_name):
     """
     Function to metric predictions of model
+    There are 15 metrics: mape, mae, explained_variance_score, max_error, mse, rmse, msle, rmsle, mae, r2, tweedie,
+    gamma, d2_ae, d2_pinball, d2_tweedie
     :param model: object of model
-    :param scaler_x_train: scalers 
-    :param scaler_y_train: 
-    :param scaler_x_test: 
+    :param scaler_y_train: scalers
     :param scaler_y_test: 
     :param X_train_scaled: data
     :param Y_train_scaled: 
@@ -106,8 +106,7 @@ def get_metrics(model, scaler_x_train, scaler_y_train, scaler_x_test, scaler_y_t
     :param metric_name: 
     :return: 
     """
-    # todo seems like we don't need in x's scalers
-    # todo append all another metrics
+
     if metric_name == 'mape':
         # scaled data
         # train data
@@ -128,31 +127,320 @@ def get_metrics(model, scaler_x_train, scaler_y_train, scaler_x_test, scaler_y_t
         # test data
         y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
         Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
-        mape_train_unscaled = metrics.mean_absolute_percentage_error(Y_test_unscaled, y_test_unscaled_pred)
-        return mape_train_scaled, mape_test_scaled, mape_train_unscaled, mape_train_unscaled
+        mape_test_unscaled = metrics.mean_absolute_percentage_error(Y_test_unscaled, y_test_unscaled_pred)
+        return mape_train_scaled, mape_test_scaled, mape_train_unscaled, mape_test_unscaled
     elif metric_name == 'mae':
         # scaled data
         # train data
         y_train_scaled_pred = model.predict(X_train_scaled)
-        mape_train_scaled = metrics.mean_absolute_error(Y_train_scaled, y_train_scaled_pred)
+        mae_train_scaled = metrics.mean_absolute_error(Y_train_scaled, y_train_scaled_pred)
 
         # test data
         # train data
         y_test_scaled_pred = model.predict(X_test_scaled)
-        mape_test_scaled = metrics.mean_absolute_error(Y_test_scaled, y_test_scaled_pred)
+        mae_test_scaled = metrics.mean_absolute_error(Y_test_scaled, y_test_scaled_pred)
 
         # unscaled data
         # train data
         y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
         Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
-        mape_train_unscaled = metrics.mean_absolute_error(Y_train_unscaled, y_train_unscaled_pred)
+        mae_train_unscaled = metrics.mean_absolute_error(Y_train_unscaled, y_train_unscaled_pred)
 
         # test data
         y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
         Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
-        mape_train_unscaled = metrics.mean_absolute_error(Y_test_unscaled, y_test_unscaled_pred)
-        return mape_train_scaled, mape_test_scaled, mape_train_unscaled, mape_train_unscaled
-        
+        mae_test_unscaled = metrics.mean_absolute_error(Y_test_unscaled, y_test_unscaled_pred)
+        return mae_train_scaled, mae_test_scaled, mae_train_unscaled, mae_test_unscaled
+    elif metric_name == 'explained_variance_score':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        evs_train_scaled = metrics.explained_variance_score(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        evs_test_scaled = metrics.explained_variance_score(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        evs_train_unscaled = metrics.explained_variance_score(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        evs_test_unscaled = metrics.explained_variance_score(Y_test_unscaled, y_test_unscaled_pred)
+        return evs_train_scaled, evs_test_scaled, evs_train_unscaled, evs_test_unscaled
+    elif metric_name == 'max_error':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        max_error_train_scaled = metrics.max_error(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        max_error_test_scaled = metrics.max_error(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        max_error_train_unscaled = metrics.max_error(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        max_error_test_unscaled = metrics.max_error(Y_test_unscaled, y_test_unscaled_pred)
+        return max_error_train_scaled, max_error_test_scaled, max_error_train_unscaled, max_error_test_unscaled
+    elif metric_name == 'mse':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        mse_train_scaled = metrics.mean_squared_error(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        mse_test_scaled = metrics.mean_squared_error(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        mse_train_unscaled = metrics.mean_squared_error(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        mse_test_unscaled = metrics.mean_squared_error(Y_test_unscaled, y_test_unscaled_pred)
+        return mse_train_scaled, mse_test_scaled, mse_train_unscaled, mse_test_unscaled
+    elif metric_name == 'rmse':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        mse_train_scaled = metrics.mean_squared_error(Y_train_scaled, y_train_scaled_pred, squared=False)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        mse_test_scaled = metrics.mean_squared_error(Y_test_scaled, y_test_scaled_pred, squared=False)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        mse_train_unscaled = metrics.mean_squared_error(Y_train_unscaled, y_train_unscaled_pred, squared=False)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        mse_test_unscaled = metrics.mean_squared_error(Y_test_unscaled, y_test_unscaled_pred, squared=False)
+        return mse_train_scaled, mse_test_scaled, mse_train_unscaled, mse_test_unscaled
+    elif metric_name == 'msle':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        msle_train_scaled = metrics.mean_squared_log_error(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        msle_test_scaled = metrics.mean_squared_log_error(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        msle_train_unscaled = metrics.mean_squared_log_error(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        msle_test_unscaled = metrics.mean_squared_log_error(Y_test_unscaled, y_test_unscaled_pred)
+        return msle_train_scaled, msle_test_scaled, msle_train_unscaled, msle_test_unscaled
+    elif metric_name == 'rmsle':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        rmsle_train_scaled = metrics.mean_squared_log_error(Y_train_scaled, y_train_scaled_pred, squared=False)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        rmsle_test_scaled = metrics.mean_squared_log_error(Y_test_scaled, y_test_scaled_pred, squared=False)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        rmsle_train_unscaled = metrics.mean_squared_log_error(Y_train_unscaled, y_train_unscaled_pred, squared=False)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        rmsle_test_unscaled = metrics.mean_squared_log_error(Y_test_unscaled, y_test_unscaled_pred, squared=False)
+        return rmsle_train_scaled, rmsle_test_scaled, rmsle_train_unscaled, rmsle_test_unscaled
+    elif metric_name == 'mae':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        mae_train_scaled = metrics.median_absolute_error(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        mae_test_scaled = metrics.median_absolute_error(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        mae_train_unscaled = metrics.median_absolute_error(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        mae_test_unscaled = metrics.median_absolute_error(Y_test_unscaled, y_test_unscaled_pred)
+        return mae_train_scaled, mae_test_scaled, mae_train_unscaled, mae_test_unscaled
+    elif metric_name == 'r2':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        r2_train_scaled = metrics.r2_score(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        r2_test_scaled = metrics.r2_score(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        r2_train_unscaled = metrics.r2_score(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        r2_test_unscaled = metrics.r2_score(Y_test_unscaled, y_test_unscaled_pred)
+        return r2_train_scaled, r2_test_scaled, r2_train_unscaled, r2_test_unscaled
+    elif metric_name == 'tweedie':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        tweedie_train_scaled = metrics.mean_poisson_deviance(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        tweedie_test_scaled = metrics.mean_poisson_deviance(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        tweedie_train_unscaled = metrics.mean_poisson_deviance(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        tweedie_test_unscaled = metrics.mean_poisson_deviance(Y_test_unscaled, y_test_unscaled_pred)
+        return tweedie_train_scaled, tweedie_test_scaled, tweedie_train_unscaled, tweedie_test_unscaled
+    elif metric_name == 'gamma':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        gamma_train_scaled = metrics.mean_gamma_deviance(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        gamma_test_scaled = metrics.mean_gamma_deviance(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        gamma_train_unscaled = metrics.mean_gamma_deviance(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        gamma_test_unscaled = metrics.mean_gamma_deviance(Y_test_unscaled, y_test_unscaled_pred)
+        return gamma_train_scaled, gamma_test_scaled, gamma_train_unscaled, gamma_test_unscaled
+    elif metric_name == 'd2_ae':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        d2_ae_train_scaled = metrics.d2_absolute_error_score(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        d2_ae_test_scaled = metrics.d2_absolute_error_score(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        d2_ae_train_unscaled = metrics.d2_absolute_error_score(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        d2_ae_test_unscaled = metrics.d2_absolute_error_score(Y_test_unscaled, y_test_unscaled_pred)
+        return d2_ae_train_scaled, d2_ae_test_scaled, d2_ae_train_unscaled, d2_ae_test_unscaled
+    elif metric_name == 'd2_pinball':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        d2_pinball_train_scaled = metrics.d2_pinball_score(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        d2_pinball_test_scaled = metrics.d2_pinball_score(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        d2_pinball_train_unscaled = metrics.d2_pinball_score(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        d2_pinball_test_unscaled = metrics.d2_pinball_score(Y_test_unscaled, y_test_unscaled_pred)
+        return d2_pinball_train_scaled, d2_pinball_test_scaled, d2_pinball_train_unscaled, d2_pinball_test_unscaled
+    elif metric_name == 'd2_tweedie':
+        # scaled data
+        # train data
+        y_train_scaled_pred = model.predict(X_train_scaled)
+        d2_tweedie_train_scaled = metrics.d2_tweedie_score(Y_train_scaled, y_train_scaled_pred)
+
+        # test data
+        # train data
+        y_test_scaled_pred = model.predict(X_test_scaled)
+        d2_tweedie_test_scaled = metrics.d2_tweedie_score(Y_test_scaled, y_test_scaled_pred)
+
+        # unscaled data
+        # train data
+        y_train_unscaled_pred = scaler_y_train.inverse_transform(y_train_scaled_pred)
+        Y_train_unscaled = scaler_y_train.inverse_transform(Y_train_scaled)
+        d2_tweedie_train_unscaled = metrics.d2_tweedie_score(Y_train_unscaled, y_train_unscaled_pred)
+
+        # test data
+        y_test_unscaled_pred = scaler_y_test.inverse_transform(y_test_scaled_pred)
+        Y_test_unscaled = scaler_y_train.inverse_transform(Y_test_scaled)
+        d2_tweedie_test_unscaled = metrics.d2_tweedie_score(Y_test_unscaled, y_test_unscaled_pred)
+        return d2_tweedie_train_scaled, d2_tweedie_test_scaled, d2_tweedie_train_unscaled, d2_tweedie_test_unscaled
+    else:
+        print("""There's no such name of metric name\nPossible metrics: mape, mae, explained_variance_score, 
+                 max_error, mse, rmse, msle, rmsle, mae, r2, tweedie, gamma, d2_ae, d2_pinball, d2_tweedie""")
+        return False
 
 
 
