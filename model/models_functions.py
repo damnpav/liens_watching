@@ -1,4 +1,5 @@
 import pandas as pd
+import plotly.express as px
 import numpy as np
 from tqdm import tqdm
 from datetime import datetime as dt
@@ -9,6 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, Normalizer, PowerTransformer
 import joblib
 
+
+pd.options.plotting.backend = "plotly"
 
 data_path = '../data/lien_df1_18_01_23.csv'
 
@@ -423,9 +426,32 @@ def get_metrics(model, scaler_y_train, scaler_y_test, X_train_scaled, Y_train_sc
         return None
 
 
-def model_conveyor(data_df, model_name, scaler_name, metric_names, save_model=False):
+def plot_test_results(model, X_test_scaled, Y_test_scaled, scaler_y_test, path_to_save):
+    """
+    Model to plot test values
+    :param path_to_save: path where to save html file
+    :param model: object of model
+    :param X_test_scaled: test features
+    :param Y_test_scaled: test target
+    :param scaler_y_test: scaler
+    :return:
+    """
+    pred_df = pd.DataFrame(scaler_y_test.inverse_transform(model.predict(X_test_scaled)))
+    true_df = pd.DataFrame(scaler_y_test.inverse_transform(Y_test_scaled))
+    pred_df = pred_df.rename(columns={0: 'prediction_value'})
+    true_df = true_df.rename(columns={0: 'true_value'})
+    joined_df = pred_df.join(true_df)
+    joined_df = joined_df.sort_values(by='true')
+    joined_df = joined_df.reset_index(drop=True)
+    fig = joined_df.plot(x=joined_df.index, y=['pred', 'true'])
+    fig.write_html(path_to_save)
+
+
+
+def model_conveyor(data_df, model_name, scaler_name, metric_names, save_model=False, folder_to_save=None):
     """
     Function to pass data through conveyor of data scaling, encoding and then fitting model and measure test metrics
+    :param folder_to_save: where to save model
     :param save_model: If True then function will save models in pkl file
     :param metric_names: list with metrics
     :param scaler_name: name of scaler
@@ -451,15 +477,22 @@ def model_conveyor(data_df, model_name, scaler_name, metric_names, save_model=Fa
             metrics_results[metric_name][f'test_scaled'] = metric_test_scaled
             metrics_results[metric_name][f'train_unscaled'] = metric_train_unscaled
             metrics_results[metric_name][f'test_unscaled'] = metric_test_unscaled
+            metrics_df = pd.DataFrame(metrics_results)
 
         # save model
         if save_model:
-            joblib.dump(model, f'{model_name}_{dt.now().strftime("%H_%M_%d_%m_%Y")}.pkl')
+            joblib.dump(model, fr'{folder_to_save}{model_name}_{scaler_name}_{dt.now().strftime("%H_%M_%d_%m_%Y")}.pkl')
+            metrics_df.to_excel(fr'{folder_to_save}metrics_{model_name}_{scaler_name}_{dt.now().strftime("%H_%M_%d_%m_%Y")}.xlsx',
+                                index=False)
+            plot_test_results(model, X_test_scaled, Y_test_scaled, scaler_y_test,
+                              fr'{folder_to_save}{model_name}_{scaler_name}_{dt.now().strftime("%H_%M_%d_%m_%Y")}.html')
+
+
     else:
         print('model name not found')
         return None
 
-    return model, metrics_results, X_train_scaled, Y_train_scaled, X_test_scaled, Y_test_scaled, scaler_x_train, \
+    return model, metrics_df, X_train_scaled, Y_train_scaled, X_test_scaled, Y_test_scaled, scaler_x_train, \
            scaler_y_train, scaler_x_test, scaler_y_test
 
 
