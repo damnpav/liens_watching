@@ -1,0 +1,43 @@
+<mxfile host="app.diagrams.net" modified="2023-11-02T19:13:36.698Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15" etag="Kay98qHjFLMsxv5fgASZ" version="22.0.8" type="device">
+  <diagram name="Страница — 1" id="7f2uL9jqchBg6HtCPj6o">
+    <mxGraphModel dx="1194" dy="579" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-5" value="Links" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="hlo44Km9fiYihgU-KQ-l-1" target="hlo44Km9fiYihgU-KQ-l-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="hlo44Km9fiYihgU-KQ-l-1" target="hlo44Km9fiYihgU-KQ-l-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-1" value="LinkSaver&lt;br&gt;(parser_function.py)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="90" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="hlo44Km9fiYihgU-KQ-l-2" target="hlo44Km9fiYihgU-KQ-l-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-2" value="start" style="ellipse;shape=doubleEllipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="20" y="90" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-8" value="new Links to Parse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="hlo44Km9fiYihgU-KQ-l-4" target="hlo44Km9fiYihgU-KQ-l-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-4" value="lien_db" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="180" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="hlo44Km9fiYihgU-KQ-l-6" target="hlo44Km9fiYihgU-KQ-l-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-6" value="LinkParser&lt;br&gt;(link_parser.py)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="90" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-9" value="parsed data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=1.017;entryY=0.917;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="hlo44Km9fiYihgU-KQ-l-6" target="hlo44Km9fiYihgU-KQ-l-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hlo44Km9fiYihgU-KQ-l-10" value="end" style="ellipse;shape=doubleEllipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="570" y="90" width="60" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
