@@ -4,11 +4,9 @@ import pandas as pd
 import time
 import sqlite3
 
-links = []
-#section_link = 'https://portal-da.ru/objects/catalog/buy/warehouse_complex'
-# TODO need to select a short section
-# TODO dd greedy saving
-section_link = 'https://portal-da.ru/objects/catalog/buy/section'
+
+# TODO add config
+
 path_to_db = 'lien_db.db'
 
 
@@ -24,7 +22,8 @@ def click_and_safe(section_link, links, db_conn, db_cur):
     try:
         with sync_playwright() as p:
             browser_type = p.chromium
-            browser = browser_type.launch(headless=False)
+            #browser = browser_type.launch(headless=False)
+            browser = browser_type.launch()
             page = browser.new_page()
             logging('Open main tab', db_conn, db_cur)
             page.goto(section_link)
@@ -79,7 +78,7 @@ def click_and_safe(section_link, links, db_conn, db_cur):
 
                     page1.close()
                     links.append(current_link)
-                    save_link(current_link, db_cur, db_conn)
+                    save_link(current_link, db_conn, db_cur)
                     k += 1
                 except Exception as e:
                     logging('All links are clicked', db_conn, db_cur)
@@ -90,7 +89,7 @@ def click_and_safe(section_link, links, db_conn, db_cur):
     return links
 
 
-def save_link(link_str, cur, conn):
+def save_link(link_str, conn, cur):
     """
     Function to save link from parser to db
     :param conn: connection to database
@@ -107,10 +106,12 @@ def save_link(link_str, cur, conn):
     return None
 
 
-def logging(log_str, cur, conn):
+def logging(log_str, conn, cur):
     """
     Log to db
-    :param log_str:
+    :param cur: cursor from connection
+    :param conn: connection to db
+    :param log_str: string to log
     :return:
     """
     try:
@@ -125,9 +126,11 @@ def main():
     print('Connecting to db')
     conn = sqlite3.connect(path_to_db)
     cur = conn.cursor()
-    logging('start', cur, conn)
+    links = []
+    section_link = 'https://portal-da.ru/objects/catalog/buy/section'
+    logging('start', conn, cur)
     links_list = click_and_safe(section_link, links, conn, cur)
-    logging(f'{len(links_list)} links are saved', cur, conn)
+    logging(f'{len(links_list)} links are saved', conn, cur)
     conn.close()
 
 
