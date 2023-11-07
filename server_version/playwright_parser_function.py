@@ -6,6 +6,7 @@ import sqlite3
 
 
 # TODO add config
+# TODO add datetime to links table
 
 path_to_db = 'lien_db.db'
 
@@ -32,7 +33,7 @@ def click_and_safe(section_link, links, db_conn, db_cur):
             # while button exist - click it
             flag = True
             k = 0
-            while flag and k < 2:
+            while flag:
                 logging(f'Show more offers {k}', db_conn, db_cur)
                 try:
                     page.get_by_role("button", name="Показать ещё").click()
